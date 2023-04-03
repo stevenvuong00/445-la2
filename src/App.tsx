@@ -71,25 +71,29 @@ function App() {
         });
 
         const blobArrayBuffer = await blob.arrayBuffer();
-        const segmentedChunks = [];
-        for (let i = 0; i < numberOfChunks; i++) {
-          const chunk = new EncodedVideoChunk({
-            type: "key",
-            data: blobArrayBuffer,
-            timestamp: i * 3,
-            duration: 1 === numberOfChunks - 1 ? duration % 3 : 3,
-          });
-          const chunkData = new Uint8Array(chunk.byteLength);
-          segmentedChunks.push(chunkData);
-          fetch(`http://labs445-1.encs.concordia.ca/home/team18/public_html`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/octet-stream",
-            },
-            body: chunkData,
-            mode: "no-cors",
-          }).then((res) => console.log(res));
-        }
+        // const segmentedChunks = [];
+        // let chunk;
+        // for (let i = 0; i < numberOfChunks; i++) {
+        //   chunk = new EncodedVideoChunk({
+        //     type: "key",
+        //     data: blobArrayBuffer,
+        //     timestamp: i * 3,
+        //     duration: 1 === numberOfChunks - 1 ? duration % 3 : 3,
+        //   });
+        //   console.log(chunk);
+        //   const chunkData = new Uint8Array(chunk.byteLength);
+        //   segmentedChunks.push(chunkData);
+        // }
+        console.log(blobArrayBuffer);
+        fetch(`http://localhost:3000/lab`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+          },
+          body: blobArrayBuffer,
+          mode: "no-cors",
+        }).then((res) => console.log(res));
+        // console.log(segmentedChunks[0]);
       }
       setRecordedChunks([]);
     }, [recordedChunks]);
