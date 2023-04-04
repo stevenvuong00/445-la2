@@ -71,19 +71,6 @@ function App() {
         });
 
         const blobArrayBuffer = await blob.arrayBuffer();
-        // const segmentedChunks = [];
-        // let chunk;
-        // for (let i = 0; i < numberOfChunks; i++) {
-        //   chunk = new EncodedVideoChunk({
-        //     type: "key",
-        //     data: blobArrayBuffer,
-        //     timestamp: i * 3,
-        //     duration: 1 === numberOfChunks - 1 ? duration % 3 : 3,
-        //   });
-        //   console.log(chunk);
-        //   const chunkData = new Uint8Array(chunk.byteLength);
-        //   segmentedChunks.push(chunkData);
-        // }
         console.log(blobArrayBuffer);
         fetch(`http://localhost:3000/lab`, {
           method: "POST",
@@ -93,7 +80,6 @@ function App() {
           body: blobArrayBuffer,
           mode: "no-cors",
         }).then((res) => console.log(res));
-        // console.log(segmentedChunks[0]);
       }
       setRecordedChunks([]);
     }, [recordedChunks]);
