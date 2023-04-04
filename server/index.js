@@ -7,9 +7,20 @@ const ffmpeg = require("ffmpeg");
 const app = express();
 const port = 3000;
 const fs = require("fs");
+const multer = require("multer");
 
 var jsonParser = bodyParser.json();
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads"); // specify the destination directory for uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, `video${Date.now()}.mp4`); // set the filename for the uploaded file
+  },
+});
+const upload = multer({ storage: storage });
 
 app.use(cors({ origin: "*" }));
 
@@ -17,11 +28,11 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+app.post("/lab", upload.single("video"), (req, res) => {
+  const file = req.file;
+  console.log(file);
+  console.log(file.buffer);
 
-app.post("/lab", (req, res) => {
   // let readableVideoBuffer = new stream.PassThrough();
   // ffmpeg();
   // req.on("readable", function () {
@@ -42,4 +53,8 @@ app.post("/lab", (req, res) => {
   // }
   // });
   res.send(req.body);
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
