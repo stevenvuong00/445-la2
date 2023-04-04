@@ -30,15 +30,15 @@ app.post("/lab", (req, res) => {
     // if(Object.prototype.toString.call(req_read) === 'UintA')
     if (Object.prototype.toString.call(req_read) === "[object Uint8Array]") {
       console.log(req_read);
-      fs.writeFileSync("video.webm", req_read, { flag: "a+" }, (err) => {
-        if (err) throw err;
-      });
-      // const readable = new Readable();
-      // readable._read = () => {};
-      // readable.push(req_read);
-      // readable.push(null);
-      // const outputStream = fs.createWriteStream("video.webm");
-      // readable.pipe(outputStream);
+      //   fs.writeFileSync("video.webm", req_read, { flag: "a+" }, (err) => {
+      //     if (err) throw err;
+      //   });
+      const readable = new Readable();
+      readable._read = () => {};
+      readable.push(req_read);
+      readable.push(null);
+      const outputStream = fs.createWriteStream("video.webm");
+      readable.pipe(outputStream);
     }
   });
   res.send(req.body);
