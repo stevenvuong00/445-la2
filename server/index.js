@@ -24,22 +24,22 @@ app.listen(port, () => {
 app.post("/lab", (req, res) => {
   // let readableVideoBuffer = new stream.PassThrough();
   // ffmpeg();
-  req.on("readable", function () {
-    const req_read = req.read();
-    // console.log(req_read);\
-    // if(Object.prototype.toString.call(req_read) === 'UintA')
-    if (Object.prototype.toString.call(req_read) === "[object Uint8Array]") {
-      console.log(req_read);
-      //   fs.writeFileSync("video.webm", req_read, { flag: "a+" }, (err) => {
-      //     if (err) throw err;
-      //   });
-      const readable = new Readable();
-      readable._read = () => {};
-      readable.push(req_read);
-      readable.push(null);
-      const outputStream = fs.createWriteStream("video.webm");
-      readable.pipe(outputStream);
-    }
-  });
+  // req.on("readable", function () {
+  //   const req_read = req.read();
+  // console.log(req_read);\
+  // if(Object.prototype.toString.call(req_read) === 'UintA')
+  // if (Object.prototype.toString.call(req_read) === "[object Uint8Array]") {
+  //   console.log(req_read);
+  //   fs.writeFileSync("video.webm", req_read, { flag: "a+" }, (err) => {
+  //     if (err) throw err;
+  //   });
+  // const readable = new Readable();
+  // readable._read = () => {};
+  // readable.push(req_read);
+  // readable.push(null);
+  // const outputStream = fs.createWriteStream("video.webm");
+  // readable.pipe(outputStream);
+  // }
+  // });
   res.send(req.body);
 });
