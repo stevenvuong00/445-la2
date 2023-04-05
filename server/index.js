@@ -3,10 +3,8 @@ const cors = require("cors");
 var bodyParser = require("body-parser");
 const { Readable } = require("stream");
 // const readStream = new stream.PassThrough();
-const ffmpeg = require("ffmpeg");
 const app = express();
 const port = 3000;
-const fs = require("fs");
 const multer = require("multer");
 
 var jsonParser = bodyParser.json();
@@ -30,7 +28,6 @@ app.get("/", (req, res) => {
 
 app.post("/lab", upload.single("video"), (req, res) => {
   const file = req.file;
-  console.log(file);
   res.send(req.body);
 });
 
