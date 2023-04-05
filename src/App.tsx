@@ -11,7 +11,6 @@ function App() {
     const recordingInterval: any = useRef();
     let chunks: any[] = [];
     const [startTime, setStartTime] = useState(0);
-    const [duration, setDuration] = useState(0);
 
     function startRecording() {
       setCapturing(true);
