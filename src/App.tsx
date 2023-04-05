@@ -1,19 +1,20 @@
 import "./App.css";
-import React from "react";
+import { useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import Webcam from "react-webcam";
 
 function App() {
   const WebcamStreamCapture = () => {
-    const webcamRef = React.useRef(null);
-    const mediaRecorderRef = React.useRef(null);
-    const [capturing, setCapturing] = React.useState(false);
-    const [recordedChunks, setRecordedChunks] = React.useState([]);
-    const [startTime, setStartTime] = React.useState(0);
+    const webcamRef = useRef(null);
+    const mediaRecorderRef = useRef(null);
+    const [capturing, setCapturing] = useState(false);
+    const recordingInterval: any = useRef();
+    let chunks: any[] = [];
+    const [startTime, setStartTime] = useState(0);
+    const [duration, setDuration] = useState(0);
 
-    const handleStartCaptureClick = React.useCallback(() => {
+    function startRecording() {
       setCapturing(true);
-      setStartTime(Date.now());
       (mediaRecorderRef.current as any) = new MediaRecorder(
         (webcamRef.current as any).stream,
         {
@@ -23,102 +24,72 @@ function App() {
 
       (mediaRecorderRef.current as any).addEventListener(
         "dataavailable",
-        handleDataAvailable
-      );
-
-      (mediaRecorderRef.current as any).start(3000);
-      // setInterval(
-      //   () => {
-      //     console.log(recordedChunks);
-      //     handleSend();
-      //   },
-      //   3000,
-      //   [handleDataAvailable, recordedChunks]
-      // );
-    }, [webcamRef, setCapturing, mediaRecorderRef]);
-
-    const handleDataAvailable = React.useCallback(
-      ({ data }: { data: any }) => {
-        if (data.size > 0) {
-          setRecordedChunks((prev) => prev.concat(data));
-          const formData = new FormData();
-          const blob = new Blob([data], {
-            type: "video/webm",
-          });
-          formData.append("video", blob, "video.webm");
-          console.log(data);
-          console.log(formData);
-          fetch(`http://localhost:3000/lab`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "video/webm",
-              // "Content-Type": "application/octet-stream",
-            },
-            body: formData,
-            mode: "no-cors",
-          }).then((res) => console.log(res));
+        (e: any) => {
+          console.log("dataavailable");
+          chunks.push(e.data);
         }
-      },
-      [setRecordedChunks]
-    );
+      );
+      (mediaRecorderRef.current as any).addEventListener("stop", (e: any) =>
+        sendData(chunks)
+      );
+      setStartTime(Date.now());
+      (mediaRecorderRef.current as any).start();
 
-    const handleStopCaptureClick = React.useCallback(async () => {
-      (mediaRecorderRef.current as any).stop();
-      setCapturing(false);
-      setRecordedChunks([]);
-    }, [mediaRecorderRef, webcamRef, setCapturing]);
+      recordingInterval.current = setInterval(() => {
+        (mediaRecorderRef.current as any).stop();
+        (mediaRecorderRef.current as any) = new MediaRecorder(
+          (webcamRef.current as any).stream,
+          {
+            mimeType: "video/webm",
+          }
+        );
+        (mediaRecorderRef.current as any).addEventListener(
+          "dataavailable",
+          (e: any) => {
+            chunks.push(e.data);
+          }
+        );
+        (mediaRecorderRef.current as any).addEventListener("stop", (e: any) =>
+          sendData(chunks)
+        );
+        chunks = [];
+        (mediaRecorderRef.current as any).start();
+      }, 3000);
+    }
 
-    const handleSend = React.useCallback(async () => {
-      setCapturing(false);
-      const duration = (Date.now() - startTime) / 1000;
-      const numberOfChunks = Math.ceil(duration / 3);
+    function sendData(chunks: any[]) {
+      const blob = new Blob(chunks, {
+        type: "video/webm",
+      });
+
+      const formData = new FormData();
+      formData.append("video", blob, "video.webm");
+
+      fetch(`http://localhost:3000/lab`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "video/webm",
+        },
+        body: formData,
+        mode: "no-cors",
+      }).then((res) => console.log(res));
+    }
+
+    function stopRecording() {
+      const duration = Date.now() - startTime;
+      const timeRemainder = duration % 3000;
       console.log("duration", duration);
-      console.log("numberOfChunks", numberOfChunks);
-
-      if (recordedChunks.length) {
-        // const blob = new Blob(recordedChunks);
-        // console.log(recordedChunks);
-        // const blobArrayBuffer = await blob.arrayBuffer();
-        // const segmentSize = 3 * 1000; // convert to milliseconds
-        // const chunks = [];
-        // let offset = 0;
-        // while (offset < blob.size) {
-        //   const chunkSize = Math.min(segmentSize, blob.size - offset);
-        //   const chunkBlob = blob.slice(offset, offset + chunkSize);
-        //   chunks.push(chunkBlob);
-        //   offset += chunkSize;
-        // }
-        // console.log(chunks.length);
-        // // chunks.forEach((chunk) => {
-        // const data = new FormData();
-        // data.append("video", chunks[0], "video.mp4");
-        // console.log(blobArrayBuffer);
-        // fetch(`http://localhost:3000/lab`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "video/mp4",
-        //     // "Content-Type": "application/octet-stream",
-        //   },
-        //   body: data,
-        //   mode: "no-cors",
-        // }).then((res) => console.log(res));
-        // });
-        // for (let i = 0; i < numberOfChunks; i++) {
-        //   const chunk = new EncodedVideoChunk({
-        //     type: "key",
-        //     data: blobArrayBuffer,
-        //     timestamp: i * 3,
-        //     duration: 1 === numberOfChunks - 1 ? duration % 3 : 3,
-        //   });
-        //   const arrayBuffer = new ArrayBuffer(chunk.byteLength);
-        //   chunk.copyTo(arrayBuffer);
-        //   const dataBlob = new Blob([arrayBuffer]);
-        //   const data = new FormData();
-        //   data.append("video", dataBlob, `video${i}.mp4`);
-        // }
+      console.log("timeRemainder", timeRemainder);
+      setCapturing(false);
+      if (timeRemainder !== 0) {
+        setTimeout(
+          () => clearInterval(recordingInterval.current),
+          3100 - timeRemainder
+        );
+      } else {
+        clearInterval(recordingInterval.current);
       }
-      setRecordedChunks([]);
-    }, [recordedChunks]);
+    }
 
     return (
       <>
@@ -133,13 +104,10 @@ function App() {
           }}
         />
         {capturing ? (
-          <button onClick={handleStopCaptureClick}>Stop Capture</button>
+          <button onClick={stopRecording}>Stop Capture</button>
         ) : (
-          <button onClick={handleStartCaptureClick}>Start Capture</button>
+          <button onClick={startRecording}>Start Capture</button>
         )}
-        {/* {recordedChunks.length > 0 && (
-          <button onClick={handleSend}>Send to server</button>
-        )} */}
       </>
     );
   };
