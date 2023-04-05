@@ -12,10 +12,10 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads"); // specify the destination directory for uploaded files
+    cb(null, "../../public_html/"); // specify the destination directory for uploaded files
   },
   filename: function (req, file, cb) {
-    cb(null, `video-${Date.now()}.webm`); // set the filename for the uploaded file
+    cb(null, `video-${Date.now()}.mp4`); // set the filename for the uploaded file
   },
 });
 const upload = multer({ storage: storage });
