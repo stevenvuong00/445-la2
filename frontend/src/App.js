@@ -8,66 +8,54 @@ function App() {
     const webcamRef = useRef(null);
     const mediaRecorderRef = useRef(null);
     const [capturing, setCapturing] = useState(false);
-    const recordingInterval: any = useRef();
-    let chunks: any[] = [];
+    const recordingInterval = useRef();
+    let chunks = [];
     const [startTime, setStartTime] = useState(0);
 
     function startRecording() {
       setCapturing(true);
-      (mediaRecorderRef.current as any) = new MediaRecorder(
-        (webcamRef.current as any).stream,
-        {
-          mimeType: "video/webm",
-        }
-      );
+      mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+        mimeType: "video/webm",
+      });
 
-      (mediaRecorderRef.current as any).addEventListener(
-        "dataavailable",
-        (e: any) => {
-          console.log("dataavailable");
-          chunks.push(e.data);
-        }
-      );
-      (mediaRecorderRef.current as any).addEventListener("stop", (e: any) =>
+      mediaRecorderRef.current.addEventListener("dataavailable", (e) => {
+        console.log("dataavailable");
+        chunks.push(e.data);
+      });
+      mediaRecorderRef.current.addEventListener("stop", (e) =>
         sendData(chunks)
       );
       setStartTime(Date.now());
-      (mediaRecorderRef.current as any).start();
+      mediaRecorderRef.current.start();
 
       recordingInterval.current = setInterval(() => {
-        (mediaRecorderRef.current as any).stop();
-        (mediaRecorderRef.current as any) = new MediaRecorder(
-          (webcamRef.current as any).stream,
-          {
-            mimeType: "video/webm",
-          }
-        );
-        (mediaRecorderRef.current as any).addEventListener(
-          "dataavailable",
-          (e: any) => {
-            chunks.push(e.data);
-          }
-        );
-        (mediaRecorderRef.current as any).addEventListener("stop", (e: any) =>
+        mediaRecorderRef.current.stop();
+        mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+          mimeType: "video/webm",
+        });
+        mediaRecorderRef.current.addEventListener("dataavailable", (e) => {
+          chunks.push(e.data);
+        });
+        mediaRecorderRef.current.addEventListener("stop", (e) =>
           sendData(chunks)
         );
         chunks = [];
-        (mediaRecorderRef.current as any).start();
+        mediaRecorderRef.current.start();
       }, 3000);
     }
 
-    function sendData(chunks: any[]) {
+    function sendData(chunks) {
       const blob = new Blob(chunks, {
         type: "video/webm",
       });
 
       const formData = new FormData();
-      formData.append("video", blob, "video.webm");
+      formData.append("video", blob, "video.mp4");
 
-      fetch(`http://localhost:3000/lab`, {
+      fetch(`http://localhost:4000/lab`, {
         method: "POST",
         headers: {
-          "Content-Type": "video/webm",
+          "Content-Type": "video/mp4",
         },
         body: formData,
         mode: "no-cors",

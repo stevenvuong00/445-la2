@@ -4,7 +4,7 @@ var bodyParser = require("body-parser");
 const { Readable } = require("stream");
 // const readStream = new stream.PassThrough();
 const app = express();
-const port = 3000;
+const port = 4000;
 const multer = require("multer");
 
 var jsonParser = bodyParser.json();
@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads"); // specify the destination directory for uploaded files
   },
   filename: function (req, file, cb) {
-    cb(null, `video-${Date.now()}.webm`); // set the filename for the uploaded file
+    cb(null, `video-${Date.now()}.mp4`); // set the filename for the uploaded file
   },
 });
 const upload = multer({ storage: storage });
