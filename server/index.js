@@ -4,7 +4,7 @@ var bodyParser = require("body-parser");
 const { Readable } = require("stream");
 // const readStream = new stream.PassThrough();
 const app = express();
-const port = 3000;
+const port = 4000;
 const multer = require("multer");
 
 var jsonParser = bodyParser.json();
@@ -12,7 +12,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "../../public_html/"); // specify the destination directory for uploaded files
+    cb(null, "uploads"); // specify the destination directory for uploaded files
   },
   filename: function (req, file, cb) {
     cb(null, `video-${Date.now()}.mp4`); // set the filename for the uploaded file
