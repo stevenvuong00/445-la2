@@ -1,5 +1,5 @@
 import "./App.css";
-import { useRef, useState } from "react";
+import { React, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import Webcam from "react-webcam";
 
