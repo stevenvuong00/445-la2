@@ -52,7 +52,7 @@ function App() {
       const formData = new FormData();
       formData.append("video", blob, "video.mp4");
 
-      fetch(`http://localhost:7000/lab`, {
+      fetch(`http://localhost:7070/lab`, {
         method: "POST",
         headers: {
           "Content-Type": "video/mp4",
