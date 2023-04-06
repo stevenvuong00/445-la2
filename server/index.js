@@ -4,7 +4,7 @@ var bodyParser = require("body-parser");
 const { Readable } = require("stream");
 // const readStream = new stream.PassThrough();
 const app = express();
-const port = 4000;
+const port = 7000;
 const multer = require("multer");
 
 var jsonParser = bodyParser.json();
