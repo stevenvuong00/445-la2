@@ -16,6 +16,7 @@ function App() {
       setCapturing(true);
       mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
         mimeType: "video/webm",
+        videoBitsPerSecond: 5000000,
       });
 
       mediaRecorderRef.current.addEventListener("dataavailable", (e) => {
@@ -32,6 +33,7 @@ function App() {
         mediaRecorderRef.current.stop();
         mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
           mimeType: "video/webm",
+          videoBitsPerSecond: 5000000,
         });
         mediaRecorderRef.current.addEventListener("dataavailable", (e) => {
           chunks.push(e.data);
